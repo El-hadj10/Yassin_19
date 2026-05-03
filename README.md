@@ -63,13 +63,29 @@ Le bouclier propose une lecture symbolique en couches:
 
 Prerequis:
 - Python 3.10+
-- Linux/macOS/WSL recommande
+- Linux/macOS/WSL/Termux
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+pip install -r requirements-svg.txt  # optionnel (rendu SVG)
 ```
+
+### Installation Termux (Android)
+
+```bash
+pkg update -y && pkg upgrade -y
+pkg install -y python git
+python -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+# Optionnel si tu veux aussi le SVG
+pip install -r requirements-svg.txt
+```
+
+Si `matplotlib` ou `numpy` ne s'installent pas, tu peux quand meme utiliser le projet en mode web uniquement avec `--skip-svg`.
 
 ## Execution
 
@@ -77,6 +93,12 @@ pip install -r requirements.txt
 
 ```bash
 python3 main.py
+```
+
+Sur Termux (mode web-only recommande si besoin):
+
+```bash
+python main.py --skip-svg
 ```
 
 Genere:
@@ -91,6 +113,12 @@ python3 -m http.server 8000 --directory web
 
 Puis ouvrir:
 - http://localhost:8000
+
+Astuce Termux:
+
+```bash
+termux-open-url http://localhost:8000
+```
 
 ## Donnees et methodologie
 

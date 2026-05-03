@@ -1,2 +1,2 @@
-matplotlib>=3.7.0
-numpy>=1.24.0
+# Dependances de base (analyse + export JSON web)
+# Le rendu SVG est optionnel et se trouve dans requirements-svg.txt
