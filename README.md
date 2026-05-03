@@ -1,5 +1,7 @@
 # Bouclier de Yassin x 19
 
+![Apercu du site Bouclier de Yassin x 19](web/site-preview.png)
+
 Visualisation spirituelle et mathematique de la sourate Yassin (36), articulee autour du nombre 19.
 
 Ce projet combine:
