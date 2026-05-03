@@ -1427,7 +1427,7 @@ d3.json("data.json").then(function(data) {
     const a  = fromLeft
       ? (Math.random() * 0.18 + 0.16) * Math.PI
       : (Math.random() * 0.16 + 0.66) * Math.PI;
-    const sp = 620 + Math.random() * 760;
+    const sp = 460 + Math.random() * 380;
     METEORS.push({
       x: fromLeft ? (-0.10 - Math.random() * 0.20) : (1.10 + Math.random() * 0.20),
       y: 0.02 + Math.random() * 0.42,
@@ -1440,16 +1440,10 @@ d3.json("data.json").then(function(data) {
   }
 
   function maybeMeteor(t) {
-    if (Math.random() < 0.0085) spawnMeteor();
-    if (METEORS.length < 4 && Math.random() < 0.022) spawnMeteor();
-
-    while (METEORS.length < 3) {
+    // Toutes les 30 secondes : 2 meteorites se suivent en rafale rapprochee.
+    if (t - lastMeteorSpawnAt > 30000) {
       spawnMeteor();
-    }
-
-    // Garantit une etoile filante visible regulierement.
-    if (t - lastMeteorSpawnAt > 220) {
-      spawnMeteor();
+      setTimeout(spawnMeteor, 600);
       lastMeteorSpawnAt = t;
     }
   }
