@@ -211,6 +211,29 @@
       0%,100% { opacity: 0.55; r: 96; }
       50%     { opacity: 0.85; r: 104; }
     }
+    @keyframes heart-breathe {
+      0%,100% { transform: scale(1.000); filter: drop-shadow(0 0  5px #3a1a6066); }
+      45%     { transform: scale(1.040); filter: drop-shadow(0 0 24px #7a3aaa99); }
+    }
+    @keyframes heart-ripple {
+      0%   { transform: scale(1.00); opacity: 0.50; }
+      100% { transform: scale(1.75); opacity: 0.00; }
+    }
+    .heart-breathe {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: heart-breathe 5.5s ease-in-out infinite;
+    }
+    .heart-ripple-1 {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: heart-ripple 7s ease-out infinite;
+    }
+    .heart-ripple-2 {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: heart-ripple 7s ease-out 3.5s infinite;
+    }
     @keyframes orion-rotate {
       from { transform: rotate(0deg); }
       to   { transform: rotate(360deg); }
@@ -552,12 +575,27 @@ d3.json("data.json").then(function(data) {
   nebOrange.append("stop").attr("offset","0%")  .attr("stop-color","#803010").attr("stop-opacity",0.55);
   nebOrange.append("stop").attr("offset","100%").attr("stop-color","#200800").attr("stop-opacity",0);
 
-  // Fond du noyau
+  // Ondes de respiration (expandent vers l'extérieur)
+  g.append("circle")
+    .attr("r", R_CORE)
+    .attr("fill", "none")
+    .attr("stroke", "#6a3a9a")
+    .attr("stroke-width", 1.8)
+    .attr("class", "heart-ripple-1");
+  g.append("circle")
+    .attr("r", R_CORE)
+    .attr("fill", "none")
+    .attr("stroke", "#6a3a9a")
+    .attr("stroke-width", 1.8)
+    .attr("class", "heart-ripple-2");
+
+  // Fond du noyau (respire)
   g.append("circle")
     .attr("r",    R_CORE)
     .attr("fill", "url(#coreGrad)")
     .attr("stroke",       "#3a2050")
-    .attr("stroke-width", 1.0);
+    .attr("stroke-width", 1.0)
+    .attr("class", "heart-breathe");
 
   // Halo animé
   g.append("circle")
