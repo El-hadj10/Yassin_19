@@ -75,7 +75,8 @@ Python network exploration workflow with Tor/Privoxy routing, dork scanning stra
 
 ### Yassin_19 | Bouclier de Yassin x 19
 
-Interactive spiritual-mathematical dome around Surah 36 and the number 19.
+Interactive spiritual-mathematical dome around Surah 36 and the number 19.  
+🌐 **[Live demo](https://el-hadj10.github.io/Yassin_19/)** · MIT License
 
 - Abjad computation and 19-sector architecture
 - D3.js immersive visualization with Orion, breathing core, cosmic background

@@ -113,7 +113,7 @@ Puis ouvrir:
 
 - Parametre UI pour ajuster l offset hijri (-1/0/+1)
 - Export PNG en plus du SVG
-- Publication GitHub Pages
+- ~~Publication GitHub Pages~~ ✅
 - Mode comparaison entre differentes conventions d observation lunaire
 
 ## Auteur
