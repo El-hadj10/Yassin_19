@@ -1,6 +1,7 @@
 # Bouclier de Yassin x 19
 
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-success?style=for-the-badge&logo=github&logoColor=white)](https://el-hadj10.github.io/Yassin_19/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
 
 ![Apercu du site Bouclier de Yassin x 19](web/site-preview.png)
 
