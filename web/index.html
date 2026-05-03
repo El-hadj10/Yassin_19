@@ -215,10 +215,17 @@
       0%,100% { transform: scale(1.000); filter: drop-shadow(0 0  5px #3a1a6066); }
       45%     { transform: scale(1.040); filter: drop-shadow(0 0 24px #7a3aaa99); }
     }
-    @keyframes heart-ripple {
-      0%   { transform: scale(1.00); opacity: 0.55; }
-      70%  { opacity: 0.22; }
-      100% { transform: scale(3.70); opacity: 0.00; }
+    @keyframes heart-ripple-a {
+      0%   { transform: scale(1.00); opacity: 0.58; stroke: #7c3aed; }
+      40%  { stroke: #4f46e5; }
+      70%  { opacity: 0.20; stroke: #3730a3; }
+      100% { transform: scale(3.70); opacity: 0.00; stroke: #1e1b4b; }
+    }
+    @keyframes heart-ripple-b {
+      0%   { transform: scale(1.00); opacity: 0.58; stroke: #4338ca; }
+      40%  { stroke: #6d28d9; }
+      70%  { opacity: 0.20; stroke: #7c3aed; }
+      100% { transform: scale(3.70); opacity: 0.00; stroke: #4c1d95; }
     }
     .heart-breathe {
       transform-box: fill-box;
@@ -228,12 +235,12 @@
     .heart-ripple-1 {
       transform-box: fill-box;
       transform-origin: center;
-      animation: heart-ripple 11s ease-out infinite;
+      animation: heart-ripple-a 11s ease-out infinite;
     }
     .heart-ripple-2 {
       transform-box: fill-box;
       transform-origin: center;
-      animation: heart-ripple 11s ease-out 5.5s infinite;
+      animation: heart-ripple-b 11s ease-out 5.5s infinite;
     }
     @keyframes orion-rotate {
       from { transform: rotate(0deg); }
@@ -576,18 +583,16 @@ d3.json("data.json").then(function(data) {
   nebOrange.append("stop").attr("offset","0%")  .attr("stop-color","#803010").attr("stop-opacity",0.55);
   nebOrange.append("stop").attr("offset","100%").attr("stop-color","#200800").attr("stop-opacity",0);
 
-  // Ondes de respiration (expandent vers l'extérieur)
+  // Ondes de respiration (expandent vers l'extérieur, couleur alternée)
   g.append("circle")
     .attr("r", R_CORE)
     .attr("fill", "none")
-    .attr("stroke", "#6a3a9a")
-    .attr("stroke-width", 1.8)
+    .attr("stroke-width", 2.0)
     .attr("class", "heart-ripple-1");
   g.append("circle")
     .attr("r", R_CORE)
     .attr("fill", "none")
-    .attr("stroke", "#6a3a9a")
-    .attr("stroke-width", 1.8)
+    .attr("stroke-width", 2.0)
     .attr("class", "heart-ripple-2");
 
   // Fond du noyau (respire)
