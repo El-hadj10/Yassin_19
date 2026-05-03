@@ -8,24 +8,98 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
+    #cosmos {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      pointer-events: none;
+    }
+
     body {
       background: transparent;
       color: #e0d8c0;
-
-          #cosmos {
-            position: fixed;
-            inset: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
-            pointer-events: none;
-          }
       font-family: 'Noto Naskh Arabic', 'Scheherazade New', 'DejaVu Sans', sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
       padding: 24px 16px;
+    }
+
+    #lunar-calendar {
+      position: fixed;
+      top: 26px;
+      right: 26px;
+      width: min(320px, 34vw);
+      padding: 14px 16px;
+      border: 1px solid #3a4780;
+      border-radius: 14px;
+      background: linear-gradient(155deg, rgba(8,11,32,0.84), rgba(12,16,48,0.64));
+      backdrop-filter: blur(4px);
+      box-shadow: 0 0 26px rgba(70, 90, 190, 0.22);
+      z-index: 20;
+      direction: rtl;
+      text-align: right;
+    }
+
+    .lunar-title {
+      color: #dce3ff;
+      font-size: 0.76rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .lunar-clock {
+      color: #ffd87a;
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      direction: ltr;
+      text-align: left;
+    }
+
+    .lunar-hijri {
+      color: #e7edff;
+      font-size: 0.95rem;
+      line-height: 1.65;
+      margin-bottom: 4px;
+    }
+
+    .lunar-gregorian {
+      color: #9bb0da;
+      font-size: 0.78rem;
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+
+    .lunar-phase {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-top: 1px solid rgba(128, 146, 202, 0.28);
+      padding-top: 8px;
+      color: #b8c8ff;
+      font-size: 0.83rem;
+      direction: ltr;
+    }
+
+    .lunar-phase-emoji {
+      font-size: 1.15rem;
+      filter: drop-shadow(0 0 6px rgba(212, 225, 255, 0.42));
+    }
+
+    @media (max-width: 900px) {
+      #lunar-calendar {
+        position: relative;
+        top: auto;
+        right: auto;
+        width: min(96vw, 420px);
+        margin: 2px auto 14px auto;
+      }
     }
 
     #header {
@@ -283,6 +357,17 @@
 <div id="header">
   <div class="basmala">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
   <div class="title">Bouclier de Yassin × 19 — بُوقِلَّةُ يٰسٓ</div>
+</div>
+
+<div id="lunar-calendar" aria-live="polite">
+  <div class="lunar-title">Calendrier Lunaire</div>
+  <div class="lunar-clock" id="lunar-time">--:--:--</div>
+  <div class="lunar-hijri" id="lunar-hijri">--</div>
+  <div class="lunar-gregorian" id="lunar-gregorian">--</div>
+  <div class="lunar-phase">
+    <span id="lunar-phase-name">Phase lunaire</span>
+    <span class="lunar-phase-emoji" id="lunar-phase-emoji">🌕</span>
+  </div>
 </div>
 
 <div id="shield-container"></div>
@@ -861,6 +946,59 @@ d3.json("data.json").then(function(data) {
       <a href="http://localhost:8000" style="color:#4499ff">http://localhost:8000</a>
     </div>`;
 });
+</script>
+
+<script>
+(function() {
+  const elTime = document.getElementById('lunar-time');
+  const elHijri = document.getElementById('lunar-hijri');
+  const elGregorian = document.getElementById('lunar-gregorian');
+  const elPhaseName = document.getElementById('lunar-phase-name');
+  const elPhaseEmoji = document.getElementById('lunar-phase-emoji');
+
+  function getMoonAge(date) {
+    const SYNODIC_MONTH = 29.530588853;
+    const KNOWN_NEW_MOON = Date.UTC(2000, 0, 6, 18, 14, 0);
+    const days = (date.getTime() - KNOWN_NEW_MOON) / 86400000;
+    return ((days % SYNODIC_MONTH) + SYNODIC_MONTH) % SYNODIC_MONTH;
+  }
+
+  function moonPhaseInfo(age) {
+    if (age < 1.84566) return { emoji: '🌑', name: 'Nouvelle lune' };
+    if (age < 5.53699) return { emoji: '🌒', name: 'Premier croissant' };
+    if (age < 9.22831) return { emoji: '🌓', name: 'Premier quartier' };
+    if (age < 12.91963) return { emoji: '🌔', name: 'Gibbeuse croissante' };
+    if (age < 16.61096) return { emoji: '🌕', name: 'Pleine lune' };
+    if (age < 20.30228) return { emoji: '🌖', name: 'Gibbeuse décroissante' };
+    if (age < 23.99361) return { emoji: '🌗', name: 'Dernier quartier' };
+    if (age < 27.68493) return { emoji: '🌘', name: 'Dernier croissant' };
+    return { emoji: '🌑', name: 'Nouvelle lune' };
+  }
+
+  function updateLunarClock() {
+    const now = new Date();
+    const hijri = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+    }).format(now);
+    const gregorian = new Intl.DateTimeFormat('fr-FR', {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+    }).format(now);
+    const time = new Intl.DateTimeFormat('fr-FR', {
+      hour: '2-digit', minute: '2-digit', second: '2-digit'
+    }).format(now);
+
+    const phase = moonPhaseInfo(getMoonAge(now));
+
+    elTime.textContent = time;
+    elHijri.textContent = hijri;
+    elGregorian.textContent = gregorian;
+    elPhaseName.textContent = phase.name;
+    elPhaseEmoji.textContent = phase.emoji;
+  }
+
+  updateLunarClock();
+  setInterval(updateLunarClock, 1000);
+})();
 </script>
 
 <!-- ══════════════════════════════════════════════════════════
