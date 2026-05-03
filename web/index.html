@@ -495,24 +495,62 @@ d3.json("data.json").then(function(data) {
 
   // يس — sceau central
   g.append("text")
-    .attr("y",                 -10)
+    .attr("y",                 -26)
     .attr("text-anchor",       "middle")
     .attr("dominant-baseline", "central")
     .attr("fill",      C_SEAL)
-    .attr("font-size", "38px")
+    .attr("font-size", "34px")
     .attr("font-weight", "bold")
     .attr("pointer-events", "none")
     .text("يس");
 
+  // ── Nom du porteur — celui que le bouclier protège ──────────────────
+  // Halo lumineux derrière le nom
+  g.append("text")
+    .attr("y",                 6)
+    .attr("text-anchor",       "middle")
+    .attr("dominant-baseline", "central")
+    .attr("fill",              "none")
+    .attr("stroke",            "#FFD700")
+    .attr("stroke-width",      6)
+    .attr("stroke-opacity",    0.12)
+    .attr("font-size",         "15px")
+    .attr("font-weight",       "bold")
+    .attr("letter-spacing",    "0.18em")
+    .attr("pointer-events",    "none")
+    .text("OUSMANE");
+
+  // Nom principal
+  g.append("text")
+    .attr("y",                 6)
+    .attr("text-anchor",       "middle")
+    .attr("dominant-baseline", "central")
+    .attr("fill",              "#e8d8b0")
+    .attr("font-size",         "15px")
+    .attr("font-weight",       "bold")
+    .attr("letter-spacing",    "0.18em")
+    .attr("pointer-events",    "none")
+    .text("OUSMANE");
+
+  // Lignes décoratives de part et d'autre du nom
+  [[-38, -14], [14, 38]].forEach(([x1, x2]) => {
+    g.append("line")
+      .attr("x1", x1).attr("y1", 6)
+      .attr("x2", x2).attr("y2", 6)
+      .attr("stroke",       "#8a7040")
+      .attr("stroke-width", 0.8)
+      .attr("opacity",      0.6);
+  });
+
   // Sous-titre "سورة ٣٦"
   g.append("text")
-    .attr("y",                 22)
+    .attr("y",                 24)
     .attr("text-anchor",       "middle")
     .attr("dominant-baseline", "central")
     .attr("fill",      "#6a5030")
-    .attr("font-size", "9px")
+    .attr("font-size", "8px")
     .attr("pointer-events", "none")
-    .text("سورة ٣٦");
+    .text("سورة ٣٦  ·  بِإِذْنِ اللَّهِ");
 
   // 7 versets résiduels en cercle dans le noyau
   const coreR = 68;
