@@ -1440,15 +1440,15 @@ d3.json("data.json").then(function(data) {
   }
 
   function maybeMeteor(t) {
-    if (Math.random() < 0.0062) spawnMeteor();
-    if (METEORS.length < 3 && Math.random() < 0.014) spawnMeteor();
+    if (Math.random() < 0.0085) spawnMeteor();
+    if (METEORS.length < 4 && Math.random() < 0.022) spawnMeteor();
 
     while (METEORS.length < 3) {
       spawnMeteor();
     }
 
     // Garantit une etoile filante visible regulierement.
-    if (t - lastMeteorSpawnAt > 500) {
+    if (t - lastMeteorSpawnAt > 220) {
       spawnMeteor();
       lastMeteorSpawnAt = t;
     }
