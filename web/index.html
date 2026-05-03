@@ -216,8 +216,9 @@
       45%     { transform: scale(1.040); filter: drop-shadow(0 0 24px #7a3aaa99); }
     }
     @keyframes heart-ripple {
-      0%   { transform: scale(1.00); opacity: 0.50; }
-      100% { transform: scale(1.75); opacity: 0.00; }
+      0%   { transform: scale(1.00); opacity: 0.55; }
+      70%  { opacity: 0.22; }
+      100% { transform: scale(3.70); opacity: 0.00; }
     }
     .heart-breathe {
       transform-box: fill-box;
@@ -227,12 +228,12 @@
     .heart-ripple-1 {
       transform-box: fill-box;
       transform-origin: center;
-      animation: heart-ripple 7s ease-out infinite;
+      animation: heart-ripple 11s ease-out infinite;
     }
     .heart-ripple-2 {
       transform-box: fill-box;
       transform-origin: center;
-      animation: heart-ripple 7s ease-out 3.5s infinite;
+      animation: heart-ripple 11s ease-out 5.5s infinite;
     }
     @keyframes orion-rotate {
       from { transform: rotate(0deg); }
