@@ -1134,8 +1134,8 @@ d3.json("data.json").then(function(data) {
   const elPhaseEmoji = document.getElementById('lunar-phase-emoji');
   const elSolarLive = document.getElementById('solar-live');
 
-  // Ajustement d'observation local: en France, ce mois est observe avec -1 jour.
-  const HIJRI_OBSERVATION_OFFSET_DAYS = -1;
+  // Ajustement d'observation local: 0 jour pour garder la coherence affichee.
+  const HIJRI_OBSERVATION_OFFSET_DAYS = 0;
 
   // Coordonnées: GPS navigateur si autorisé, sinon fallback Dakar.
   const solarGeo = { lat: 14.7167, lon: -17.4677, source: 'fallback' };
