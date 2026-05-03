@@ -220,6 +220,47 @@
       box-shadow: 0 4px 24px rgba(0,0,0,0.7);
     }
 
+    #solar-tooltip {
+      position: fixed;
+      pointer-events: none;
+      opacity: 0;
+      background: rgba(8, 10, 24, 0.97);
+      border: 1px solid #6b5a20;
+      border-radius: 10px;
+      padding: 10px 12px;
+      width: 295px;
+      z-index: 220;
+      transition: opacity 0.1s;
+      direction: ltr;
+      text-align: left;
+      box-shadow: 0 4px 22px rgba(0,0,0,0.68);
+      color: #d6e2ff;
+      font-size: 0.74rem;
+      line-height: 1.45;
+    }
+
+    .solar-tt-title {
+      color: #ffd56a;
+      font-weight: 700;
+      margin-bottom: 6px;
+      letter-spacing: 0.03em;
+    }
+
+    .solar-tt-grid {
+      display: grid;
+      grid-template-columns: 112px 1fr;
+      gap: 3px 10px;
+    }
+
+    .solar-tt-key {
+      color: #90a3d6;
+    }
+
+    .solar-tt-val {
+      color: #d8e4ff;
+      font-weight: 600;
+    }
+
     .tt-row-header {
       display: flex;
       justify-content: space-between;
@@ -422,6 +463,8 @@
   </div>
 </div>
 
+<div id="solar-tooltip"></div>
+
 <script>
 // ═══════════════════════════════════════════════════════════════════════
 //  CONFIGURATION GÉOMÉTRIQUE
@@ -476,6 +519,17 @@ const arcGen = d3.arc();
 //  TOOLTIP
 // ═══════════════════════════════════════════════════════════════════════
 const tooltip = d3.select("#tooltip");
+const solarTooltip = d3.select("#solar-tooltip");
+
+window.__solarLiveData = {
+  azimuthDeg: 0,
+  elevationDeg: -10,
+  source: "Fallback",
+  time: "--:--:--",
+  date: "--",
+  hijri: "--",
+  state: "Nuit",
+};
 
 function showVerseTooltip(event, v) {
   d3.select("#tt-num").text(v.num);
@@ -574,13 +628,15 @@ d3.json("data.json").then(function(data) {
     .attr("x2", 0).attr("y2", -R_SOLAR_ORBIT)
     .attr("stroke", "#d5a93a")
     .attr("stroke-width", 0.9)
-    .attr("opacity", 0.38);
+    .attr("opacity", 0.38)
+    .attr("pointer-events", "none");
 
   const solarHalo = solarG.append("circle")
     .attr("cx", 0).attr("cy", -R_SOLAR_ORBIT)
     .attr("r", 14)
     .attr("fill", "#ffd778")
-    .attr("opacity", 0.18);
+    .attr("opacity", 0.18)
+    .attr("pointer-events", "none");
 
   const solarDot = solarG.append("circle")
     .attr("cx", 0).attr("cy", -R_SOLAR_ORBIT)
@@ -588,7 +644,51 @@ d3.json("data.json").then(function(data) {
     .attr("fill", "#ffd24a")
     .attr("stroke", "#fff0b0")
     .attr("stroke-width", 0.7)
-    .attr("opacity", 0.95);
+    .attr("opacity", 0.95)
+    .attr("pointer-events", "none");
+
+  const solarHit = solarG.append("circle")
+    .attr("cx", 0)
+    .attr("cy", -R_SOLAR_ORBIT)
+    .attr("r", 13)
+    .attr("fill", "transparent")
+    .style("cursor", "pointer");
+
+  function showSolarTooltip(event) {
+    const s = window.__solarLiveData || {};
+    solarTooltip.html(`
+      <div class="solar-tt-title">☀ Caracteristiques du Soleil</div>
+      <div class="solar-tt-grid">
+        <div class="solar-tt-key">Heure reelle</div><div class="solar-tt-val">${s.time || "--:--:--"}</div>
+        <div class="solar-tt-key">Date reelle</div><div class="solar-tt-val">${s.date || "--"}</div>
+        <div class="solar-tt-key">Date hijri</div><div class="solar-tt-val">${s.hijri || "--"}</div>
+        <div class="solar-tt-key">Azimut</div><div class="solar-tt-val">${(s.azimuthDeg ?? 0).toFixed(1)} deg</div>
+        <div class="solar-tt-key">Altitude</div><div class="solar-tt-val">${(s.elevationDeg ?? -10).toFixed(1)} deg</div>
+        <div class="solar-tt-key">Etat solaire</div><div class="solar-tt-val">${s.state || "Nuit"}</div>
+        <div class="solar-tt-key">Source position</div><div class="solar-tt-val">${s.source || "Fallback"}</div>
+      </div>
+    `);
+
+    const tipW = 305;
+    const x = event.clientX + 18 + tipW > window.innerWidth
+      ? event.clientX - tipW - 12
+      : event.clientX + 18;
+    const y = Math.min(window.innerHeight - 170, Math.max(12, event.clientY - 12));
+
+    solarTooltip
+      .style("left", x + "px")
+      .style("top", y + "px")
+      .style("opacity", 1);
+  }
+
+  function hideSolarTooltip() {
+    solarTooltip.style("opacity", 0);
+  }
+
+  solarHit
+    .on("mousemove", showSolarTooltip)
+    .on("mouseenter", showSolarTooltip)
+    .on("mouseleave", hideSolarTooltip);
 
   window.__updateSolarVisual = function(solar) {
     const a = (solar.azimuthDeg || 0) * Math.PI / 180;
@@ -616,6 +716,10 @@ d3.json("data.json").then(function(data) {
       .attr("fill", elev >= 0 ? "#ffd24a" : "#c8bfd6")
       .attr("stroke", elev >= 0 ? "#fff0b0" : "#e6dfff")
       .attr("opacity", 0.48 + dayFactor * 0.52);
+
+    solarHit
+      .attr("cx", x)
+      .attr("cy", y);
   };
 
   // Cercles décoratifs (grille)
@@ -1121,6 +1225,8 @@ d3.json("data.json").then(function(data) {
     const az = sun.azimuthDeg.toFixed(1);
     const el = sun.elevationDeg.toFixed(1);
     const src = solarGeo.source === 'gps' ? 'GPS' : 'Fallback';
+    const elev = sun.elevationDeg;
+    const solarState = elev >= 8 ? 'Jour' : elev >= 0 ? 'Lever / Coucher' : elev >= -6 ? 'Crepuscule' : 'Nuit';
 
     elTime.textContent = time;
     elHijri.textContent = hijri;
@@ -1128,6 +1234,16 @@ d3.json("data.json").then(function(data) {
     elPhaseName.textContent = phase.name;
     elPhaseEmoji.textContent = phase.emoji;
     elSolarLive.textContent = `Soleil réel: Az ${az}° | Alt ${el}° (${src})`;
+
+    window.__solarLiveData = {
+      azimuthDeg: sun.azimuthDeg,
+      elevationDeg: sun.elevationDeg,
+      source: src,
+      time,
+      date: gregorian,
+      hijri,
+      state: solarState,
+    };
 
     if (typeof window.__updateSolarVisual === 'function') {
       window.__updateSolarVisual(sun);
