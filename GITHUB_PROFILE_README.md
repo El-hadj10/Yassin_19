@@ -98,8 +98,8 @@ End-to-end commerce intelligence platform (frontend, API, agents, queue, infra).
 ## GitHub Metrics
 
 <p align="center">
-  <img height="175" src="https://github-readme-stats.vercel.app/api?username=El-hadj10&show_icons=true&theme=transparent&hide_border=true" alt="stats" />
-  <img height="175" src="https://github-readme-stats.vercel.app/api/top-langs/?username=El-hadj10&layout=compact&theme=transparent&hide_border=true" alt="langs" />
+  <img height="175" src="https://github-readme-stats-sigma-five.vercel.app/api?username=El-hadj10&show_icons=true&theme=tokyonight&hide_border=true&include_all_commits=true&count_private=true" alt="stats" />
+  <img height="175" src="https://github-readme-stats-sigma-five.vercel.app/api/top-langs/?username=El-hadj10&layout=compact&theme=tokyonight&hide_border=true" alt="langs" />
 </p>
 
 <p align="center">
