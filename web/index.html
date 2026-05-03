@@ -1134,6 +1134,9 @@ d3.json("data.json").then(function(data) {
   const elPhaseEmoji = document.getElementById('lunar-phase-emoji');
   const elSolarLive = document.getElementById('solar-live');
 
+  // Ajustement d'observation local: en France, ce mois est observe avec -1 jour.
+  const HIJRI_OBSERVATION_OFFSET_DAYS = -1;
+
   // Coordonnées: GPS navigateur si autorisé, sinon fallback Dakar.
   const solarGeo = { lat: 14.7167, lon: -17.4677, source: 'fallback' };
 
@@ -1210,9 +1213,10 @@ d3.json("data.json").then(function(data) {
 
   function updateLunarClock() {
     const now = new Date();
+    const hijriNow = new Date(now.getTime() + HIJRI_OBSERVATION_OFFSET_DAYS * 86400000);
     const hijri = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', {
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-    }).format(now);
+    }).format(hijriNow);
     const gregorian = new Intl.DateTimeFormat('fr-FR', {
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
     }).format(now);
