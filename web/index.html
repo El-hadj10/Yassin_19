@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بُوقِلَّةُ يٰسٓ × ١٩ — Bouclier de Yassin</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0a0a1a;
+      color: #e0d8c0;
+      font-family: 'Noto Naskh Arabic', 'Scheherazade New', 'DejaVu Sans', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    #header {
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    .basmala {
+      font-size: 1.5rem;
+      color: #FFD700;
+      margin-bottom: 6px;
+      letter-spacing: 0.04em;
+    }
+
+    .title {
+      font-size: 0.95rem;
+      color: #7090b0;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    #shield-container svg {
+      display: block;
+      max-width: 100%;
+    }
+
+    /* ── Stats bar ────────────────────────────────────────── */
+    #stats {
+      margin-top: 18px;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      min-width: 60px;
+    }
+
+    .stat-value {
+      font-size: 1.15rem;
+      font-weight: bold;
+      color: #c8d8e8;
+    }
+
+    .stat-value.gold { color: #FFD700; }
+    .stat-value.zero { color: #00cc88; }
+
+    .stat-label {
+      font-size: 0.68rem;
+      color: #506070;
+      text-align: center;
+      direction: ltr;
+    }
+
+    /* ── Legend ───────────────────────────────────────────── */
+    #legend {
+      margin-top: 14px;
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      justify-content: center;
+      font-size: 0.73rem;
+      color: #8090a0;
+      direction: ltr;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-dot {
+      width: 13px;
+      height: 13px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    /* ── Tooltip ──────────────────────────────────────────── */
+    #tooltip {
+      position: fixed;
+      pointer-events: none;
+      opacity: 0;
+      background: rgba(8, 10, 24, 0.96);
+      border: 1px solid #2a3d5a;
+      border-radius: 10px;
+      padding: 13px 16px;
+      max-width: 360px;
+      z-index: 200;
+      transition: opacity 0.12s;
+      direction: rtl;
+      text-align: right;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.7);
+    }
+
+    .tt-row-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      direction: ltr;
+    }
+
+    .tt-num-badge {
+      background: #1a2a4a;
+      border: 1px solid #334466;
+      border-radius: 5px;
+      padding: 2px 8px;
+      font-size: 0.78rem;
+      color: #8090b0;
+      direction: ltr;
+    }
+
+    .tt-sig-badge {
+      font-size: 0.72rem;
+      color: #FFD700;
+      background: #2a1a00;
+      border: 1px solid #5a4000;
+      border-radius: 5px;
+      padding: 2px 8px;
+      display: none;
+    }
+
+    .tt-text {
+      font-size: 1.0rem;
+      color: #e0d8c0;
+      line-height: 1.8;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #1e2e44;
+      word-break: break-word;
+    }
+
+    .tt-stats-row {
+      display: flex;
+      gap: 18px;
+      font-size: 0.75rem;
+      color: #7090b0;
+      direction: ltr;
+    }
+
+    .tt-stats-row strong {
+      color: #b0c8e0;
+    }
+
+    /* ── Hover instruction ────────────────────────────────── */
+    #hint {
+      margin-top: 10px;
+      font-size: 0.7rem;
+      color: #354555;
+      direction: ltr;
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body>
+
+<div id="header">
+  <div class="basmala">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+  <div class="title">Bouclier de Yassin × 19 — بُوقِلَّةُ يٰسٓ</div>
+</div>
+
+<div id="shield-container"></div>
+
+<div id="stats"></div>
+
+<div id="legend">
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#FFD700;border:1px solid #aa8800"></div>
+    <span>Verset × 19 (or)</span>
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#0077bb"></div>
+    <span>Forte densité ي / س</span>
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#1a2a4a;border:1px solid #334466"></div>
+    <span>Faible densité ي / س</span>
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#1a0808;border:1px solid #5a3a1a"></div>
+    <span>Noyau central (7 résiduels)</span>
+  </div>
+</div>
+
+<div id="hint">⟵ Survole un arc ou un cercle pour voir le verset et sa valeur Abjad</div>
+
+<!-- Tooltip -->
+<div id="tooltip">
+  <div class="tt-row-header">
+    <span class="tt-num-badge">الآية <span id="tt-num"></span></span>
+    <span class="tt-sig-badge" id="tt-sig">★ مضاعف ١٩</span>
+  </div>
+  <div class="tt-text" id="tt-text"></div>
+  <div class="tt-stats-row">
+    <span>Abjad : <strong id="tt-abjad"></strong></span>
+    <span>ي : <strong id="tt-ya"></strong></span>
+    <span>س : <strong id="tt-sin"></strong></span>
+    <span>ي+س : <strong id="tt-yasin"></strong></span>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════
+//  CONFIGURATION GÉOMÉTRIQUE
+// ═══════════════════════════════════════════════════════════════════════
+const W  = 860, H = 860;
+const cx = W / 2, cy = H / 2;
+
+const R_CORE      = 110;   // rayon du noyau central (يس)
+const R_ANG_IN    = 122;   // bord intérieur de la couronne des anges
+const R_ANG_OUT   = 252;   // bord extérieur de la couronne des anges
+const R_VER_IN    = 264;   // bord intérieur de la couronne des versets
+const R_VER_OUT   = 394;   // bord extérieur de la couronne des versets
+
+const N_SECTORS   = 19;
+const N_VPS       = 4;     // versets par secteur
+const SECTOR_GAP  = 0.018; // espacement angulaire entre secteurs (rad)
+const VERSE_GAP   = 0.005; // espacement angulaire entre versets (rad)
+const OFFSET      = -Math.PI / 2; // départ à 12h
+
+// ═══════════════════════════════════════════════════════════════════════
+//  COULEURS
+// ═══════════════════════════════════════════════════════════════════════
+const C_BG       = "#0a0a1a";
+const C_GOLD     = "#FFD700";
+const C_SEAL     = "#C0A060";
+const C_CORE_BG  = "#110808";
+const C_GRID     = "#1a2438";
+
+// ═══════════════════════════════════════════════════════════════════════
+//  HELPERS ANGULAIRES
+// ═══════════════════════════════════════════════════════════════════════
+const sectorSpan = 2 * Math.PI / N_SECTORS;
+
+function sectorAngles(i) {
+  const start = OFFSET + i * sectorSpan + SECTOR_GAP / 2;
+  const end   = start + sectorSpan - SECTOR_GAP;
+  return { start, end };
+}
+
+function verseAngles(si, vi) {
+  const { start: s0, end: s1 } = sectorAngles(si);
+  const usable    = s1 - s0;
+  const vSpan     = (usable - (N_VPS - 1) * VERSE_GAP) / N_VPS;
+  const vStart    = s0 + vi * (vSpan + VERSE_GAP);
+  return { start: vStart, end: vStart + vSpan };
+}
+
+const arcGen = d3.arc();
+
+// ═══════════════════════════════════════════════════════════════════════
+//  TOOLTIP
+// ═══════════════════════════════════════════════════════════════════════
+const tooltip = d3.select("#tooltip");
+
+function showVerseTooltip(event, v) {
+  d3.select("#tt-num").text(v.num);
+  d3.select("#tt-text").text(v.text);
+  d3.select("#tt-abjad").text(v.abjad.toLocaleString("fr-FR"));
+  d3.select("#tt-ya").text(v.ya_count);
+  d3.select("#tt-sin").text(v.sin_count);
+  d3.select("#tt-yasin").text(v.ya_count + v.sin_count);
+
+  const sig = d3.select("#tt-sig");
+  sig.style("display", v.mult_19 ? "inline" : "none");
+
+  positionTooltip(event);
+}
+
+function showAngelTooltip(event, sector) {
+  const totalYaSin = d3.sum(sector.verses, v => v.ya_count + v.sin_count);
+  const totalAbjad = d3.sum(sector.verses, v => v.abjad);
+  const nums = sector.verses.map(v => v.num).join(" · ");
+  const hasGold = sector.verses.some(v => v.mult_19);
+
+  d3.select("#tt-num").text(`Ange ${sector.angel}`);
+  d3.select("#tt-text").text(`Versets : ${nums}`);
+  d3.select("#tt-abjad").text(totalAbjad.toLocaleString("fr-FR"));
+  d3.select("#tt-ya").text(d3.sum(sector.verses, v => v.ya_count));
+  d3.select("#tt-sin").text(d3.sum(sector.verses, v => v.sin_count));
+  d3.select("#tt-yasin").text(totalYaSin);
+  d3.select("#tt-sig").style("display", hasGold ? "inline" : "none");
+
+  positionTooltip(event);
+}
+
+function positionTooltip(event) {
+  const TW = 370;
+  const x  = event.clientX + 20 + TW > window.innerWidth
+              ? event.clientX - TW - 12
+              : event.clientX + 20;
+  tooltip
+    .style("left",  x + "px")
+    .style("top",  (event.clientY - 10) + "px")
+    .style("opacity", 1);
+}
+
+function hideTooltip() {
+  tooltip.style("opacity", 0);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  MAIN — chargement des données
+// ═══════════════════════════════════════════════════════════════════════
+d3.json("data.json").then(function(data) {
+
+  const { stats, sectors, core } = data;
+
+  // ── Scales couleur ──────────────────────────────────────────────────
+  const maxYaVerses  = d3.max(sectors.flatMap(s => s.verses),
+                              v => v.ya_count + v.sin_count) || 1;
+  const maxYaSectors = d3.max(sectors,
+                              s => d3.sum(s.verses, v => v.ya_count + v.sin_count)) || 1;
+
+  const verseColor  = d3.scaleSequential()
+    .domain([0, maxYaVerses])
+    .interpolator(d3.interpolateRgb("#1a2440", "#0077bb"));
+
+  const angelColor  = d3.scaleSequential()
+    .domain([0, maxYaSectors])
+    .interpolator(d3.interpolateRgb("#111e36", "#0055aa"));
+
+  // ── SVG ─────────────────────────────────────────────────────────────
+  const svg = d3.select("#shield-container")
+    .append("svg")
+    .attr("width",   W)
+    .attr("height",  H)
+    .attr("viewBox", `0 0 ${W} ${H}`);
+
+  svg.append("rect")
+    .attr("width", W).attr("height", H)
+    .attr("fill", C_BG);
+
+  const g = svg.append("g")
+    .attr("transform", `translate(${cx},${cy})`);
+
+  // Cercles décoratifs (grille)
+  [R_VER_OUT + 10, R_VER_IN  - 5,
+   R_ANG_OUT + 5,  R_ANG_IN  - 5,
+   R_CORE    + 5].forEach(r => {
+    g.append("circle").attr("r", r)
+      .attr("fill", "none")
+      .attr("stroke", C_GRID)
+      .attr("stroke-width", 0.6);
+  });
+
+  // ── Lignes radiales (19 séparateurs) ────────────────────────────────
+  for (let i = 0; i < N_SECTORS; i++) {
+    const a = OFFSET + i * sectorSpan;
+    g.append("line")
+      .attr("x1", Math.cos(a) * R_ANG_IN)
+      .attr("y1", Math.sin(a) * R_ANG_IN)
+      .attr("x2", Math.cos(a) * R_VER_OUT)
+      .attr("y2", Math.sin(a) * R_VER_OUT)
+      .attr("stroke", "#1e2e46")
+      .attr("stroke-width", 0.5);
+  }
+
+  // ── Couronne des 19 anges ────────────────────────────────────────────
+  const angelG = g.append("g").attr("class", "angel-ring");
+
+  sectors.forEach((sector, i) => {
+    const { start, end } = sectorAngles(i);
+    const sYaSin  = d3.sum(sector.verses, v => v.ya_count + v.sin_count);
+    const hasGold = sector.verses.some(v => v.mult_19);
+
+    const path = angelG.append("path")
+      .datum(sector)
+      .attr("d", arcGen({ innerRadius: R_ANG_IN, outerRadius: R_ANG_OUT,
+                          startAngle: start, endAngle: end }))
+      .attr("fill",         hasGold ? "#2e1e00" : angelColor(sYaSin))
+      .attr("stroke",       hasGold ? "#6a5010" : "#243050")
+      .attr("stroke-width", hasGold ? 0.9 : 0.4)
+      .attr("opacity",      0.85)
+      .style("cursor",      "pointer");
+
+    // Label numéro d'ange
+    const midA = (start + end) / 2;
+    const lr   = (R_ANG_IN + R_ANG_OUT) / 2;
+    g.append("text")
+      .attr("x", Math.cos(midA) * lr)
+      .attr("y", Math.sin(midA) * lr)
+      .attr("text-anchor",        "middle")
+      .attr("dominant-baseline",  "central")
+      .attr("fill",       hasGold ? C_GOLD : "#5a7898")
+      .attr("font-size",  "11px")
+      .attr("font-weight", hasGold ? "bold" : "normal")
+      .attr("pointer-events", "none")
+      .text(sector.angel);
+
+    path
+      .on("mousemove",  (ev) => {
+        path.attr("opacity", 1)
+            .attr("stroke-width", hasGold ? 1.5 : 1)
+            .attr("fill", hasGold ? "#4a3200" : "#1a3a6a");
+        showAngelTooltip(ev, sector);
+      })
+      .on("mouseleave", () => {
+        path.attr("opacity",      0.85)
+            .attr("stroke-width", hasGold ? 0.9 : 0.4)
+            .attr("fill",         hasGold ? "#2e1e00" : angelColor(sYaSin));
+        hideTooltip();
+      });
+  });
+
+  // ── Couronne des 76 versets ──────────────────────────────────────────
+  const verseG = g.append("g").attr("class", "verse-ring");
+
+  sectors.forEach((sector, si) => {
+    sector.verses.forEach((verse, vi) => {
+      const { start, end } = verseAngles(si, vi);
+      const yasin   = verse.ya_count + verse.sin_count;
+      const fillCol = verse.mult_19 ? C_GOLD : verseColor(yasin);
+
+      const path = verseG.append("path")
+        .datum(verse)
+        .attr("d", arcGen({ innerRadius: R_VER_IN, outerRadius: R_VER_OUT,
+                            startAngle: start, endAngle: end }))
+        .attr("fill",         fillCol)
+        .attr("stroke",       verse.mult_19 ? "#aa8800" : "#1e2e46")
+        .attr("stroke-width", verse.mult_19 ? 0.8 : 0.3)
+        .attr("opacity",      verse.mult_19 ? 0.92 : 0.78)
+        .style("cursor",      "pointer");
+
+      // Numéro de verset (label extérieur)
+      const midA = (start + end) / 2;
+      const lr   = R_VER_OUT + 13;
+      g.append("text")
+        .attr("x", Math.cos(midA) * lr)
+        .attr("y", Math.sin(midA) * lr)
+        .attr("text-anchor",       "middle")
+        .attr("dominant-baseline", "central")
+        .attr("fill",      verse.mult_19 ? C_GOLD : "#3a5060")
+        .attr("font-size", "6.5px")
+        .attr("pointer-events", "none")
+        .text(verse.num);
+
+      path
+        .on("mousemove",  (ev) => {
+          path.attr("opacity", 1)
+              .attr("fill",    verse.mult_19 ? "#ffe060" : "#3399dd")
+              .attr("stroke-width", 1.2);
+          showVerseTooltip(ev, verse);
+        })
+        .on("mouseleave", () => {
+          path.attr("opacity",      verse.mult_19 ? 0.92 : 0.78)
+              .attr("fill",         fillCol)
+              .attr("stroke-width", verse.mult_19 ? 0.8 : 0.3);
+          hideTooltip();
+        });
+    });
+  });
+
+  // ── Noyau central ────────────────────────────────────────────────────
+  // Fond du noyau
+  g.append("circle")
+    .attr("r",            R_CORE)
+    .attr("fill",         C_CORE_BG)
+    .attr("stroke",       "#5a3a1a")
+    .attr("stroke-width", 1.2);
+
+  // Cercle ornemental intérieur
+  g.append("circle")
+    .attr("r",            R_CORE - 14)
+    .attr("fill",         "none")
+    .attr("stroke",       "#3a2810")
+    .attr("stroke-width", 0.6)
+    .attr("stroke-dasharray", "3,3");
+
+  // يس — sceau central
+  g.append("text")
+    .attr("y",                 -10)
+    .attr("text-anchor",       "middle")
+    .attr("dominant-baseline", "central")
+    .attr("fill",      C_SEAL)
+    .attr("font-size", "38px")
+    .attr("font-weight", "bold")
+    .attr("pointer-events", "none")
+    .text("يس");
+
+  // Sous-titre "سورة ٣٦"
+  g.append("text")
+    .attr("y",                 22)
+    .attr("text-anchor",       "middle")
+    .attr("dominant-baseline", "central")
+    .attr("fill",      "#6a5030")
+    .attr("font-size", "9px")
+    .attr("pointer-events", "none")
+    .text("سورة ٣٦");
+
+  // 7 versets résiduels en cercle dans le noyau
+  const coreR = 68;
+  core.forEach((verse, i) => {
+    const angle = OFFSET + (i / core.length) * 2 * Math.PI;
+    const x = Math.cos(angle) * coreR;
+    const y = Math.sin(angle) * coreR;
+    const color = verse.mult_19 ? C_GOLD : "#5a7080";
+
+    g.append("circle")
+      .attr("cx", x).attr("cy", y).attr("r", 15)
+      .attr("fill",         verse.mult_19 ? "#2a1800" : "#0e1a26")
+      .attr("stroke",       color)
+      .attr("stroke-width", verse.mult_19 ? 1.0 : 0.6)
+      .style("cursor",      "pointer")
+      .on("mousemove",  (ev) => showVerseTooltip(ev, verse))
+      .on("mouseleave", hideTooltip);
+
+    g.append("text")
+      .attr("x", x).attr("y", y)
+      .attr("text-anchor",       "middle")
+      .attr("dominant-baseline", "central")
+      .attr("fill",      color)
+      .attr("font-size", "8.5px")
+      .attr("pointer-events", "none")
+      .text(verse.num);
+  });
+
+  // ── Barre de stats ────────────────────────────────────────────────────
+  const statsDiv = d3.select("#stats");
+
+  const items = [
+    { label: "Versets",       value: stats.total_verses },
+    { label: "Abjad total",   value: stats.total_abjad.toLocaleString("fr-FR") },
+    { label: "mod 19",        value: stats.total_abjad_mod19,
+      cls: stats.total_abjad_mod19 === 0 ? "zero" : "" },
+    { label: "Total ي",       value: stats.total_ya },
+    { label: "Total س",       value: stats.total_sin },
+    { label: "ي + س",         value: stats.total_ya_sin },
+    { label: "ي+س mod 19",    value: stats.ya_sin_mod19,
+      cls: stats.ya_sin_mod19 === 0 ? "zero" : "" },
+    { label: "Versets × 19",  value: stats.count_mult_19, cls: "gold" },
+  ];
+
+  items.forEach(item => {
+    statsDiv.append("div")
+      .attr("class", "stat-item")
+      .html(
+        `<div class="stat-value ${item.cls || ''}">${item.value}</div>
+         <div class="stat-label">${item.label}</div>`
+      );
+  });
+
+}).catch(err => {
+  document.getElementById("shield-container").innerHTML = `
+    <div style="
+      color:#ff7777; padding:40px; text-align:center;
+      font-family:monospace; font-size:0.9rem; line-height:2;
+    ">
+      <div style="font-size:1.5rem;margin-bottom:12px">⚠</div>
+      <strong>Impossible de charger data.json</strong><br>
+      Lance un serveur local depuis la racine du projet :<br><br>
+      <code style="background:#111;padding:6px 14px;border-radius:5px;color:#FFD700;">
+        python3 -m http.server 8000 --directory web
+      </code><br><br>
+      Puis ouvre →
+      <a href="http://localhost:8000" style="color:#4499ff">http://localhost:8000</a>
+    </div>`;
+});
+</script>
+</body>
+</html>

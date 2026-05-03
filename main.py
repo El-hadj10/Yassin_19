@@ -1,8 +1,9 @@
 # main.py — Bouclier de Yassin × 19
-# Orchestrateur : analyse → structure → visualisation
+# Orchestrateur : analyse → structure → visualisation (SVG + D3.js)
 
-from core.analyzer  import load_verses, analyze, global_stats
-from core.structure import build_sectors, sector_summary
+from core.analyzer   import load_verses, analyze, global_stats
+from core.structure  import build_sectors, sector_summary
+from core.export     import export_json
 from visual.bouclier import draw_shield
 
 OUTPUT_SVG = "bouclier_yassin_19.svg"
@@ -31,6 +32,14 @@ def main():
     print(f"\n[ Génération du bouclier SVG → {OUTPUT_SVG} ... ]")
     path = draw_shield(sectors_data, stats, OUTPUT_SVG)
     print(f"  → Fichier généré : {path}\n")
+
+    print("[ Export JSON pour le bouclier D3.js → web/data.json ... ]")
+    json_path = export_json("web/data.json")
+    print(f"  → Fichier généré : {json_path}")
+    print("  → Pour lancer le bouclier interactif :")
+    print("      python3 -m http.server 8000 --directory web")
+    print("      puis ouvre : http://localhost:8000\n")
+
     print("✓ Bouclier de Yassin × 19 — terminé.")
 
 
