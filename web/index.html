@@ -1418,38 +1418,76 @@ d3.json("data.json").then(function(data) {
     ctx.restore();
   }
 
-  // ── Étoiles filantes ──────────────────────────────────────────────────
-  const SHOOTS = [];
-  function maybeShoot() {
-    if (Math.random() < 0.0022) {
-      const a  = (Math.random() * 0.55 + 0.12) * Math.PI;
-      const sp = 3.5 + Math.random() * 5;
-      SHOOTS.push({
-        x: Math.random() * 0.85, y: Math.random() * 0.35,
-        vx: Math.cos(a) * sp,   vy: Math.sin(a) * sp,
-        len: 90 + Math.random() * 130,
-        alp: 1.0,
-      });
-    }
+  // ── Meteorites / etoiles filantes ────────────────────────────────────
+  const METEORS = [];
+
+  function spawnMeteor() {
+    const fromLeft = Math.random() > 0.5;
+    const a  = fromLeft
+      ? (Math.random() * 0.35 + 0.16) * Math.PI
+      : (Math.random() * 0.35 + 0.49) * Math.PI;
+    const sp = 6.0 + Math.random() * 7.5;
+    METEORS.push({
+      x: fromLeft ? (-0.10 - Math.random() * 0.20) : (1.10 + Math.random() * 0.20),
+      y: 0.02 + Math.random() * 0.36,
+      vx: Math.cos(a) * sp,
+      vy: Math.sin(a) * sp,
+      len: 130 + Math.random() * 190,
+      size: 1.2 + Math.random() * 1.9,
+      alp: 1.0,
+    });
   }
 
-  function drawShoots(dt) {
+  function maybeMeteor() {
+    if (Math.random() < 0.0032) spawnMeteor();
+    if (METEORS.length < 2 && Math.random() < 0.006) spawnMeteor();
+  }
+
+  function drawMeteors(dt) {
     const w = canvas.width, h = canvas.height;
-    for (let i = SHOOTS.length - 1; i >= 0; i--) {
-      const s = SHOOTS[i];
-      s.x  += s.vx * dt * 0.055;
-      s.y  += s.vy * dt * 0.055;
-      s.alp -= 0.011 * (dt / 16);
-      if (s.alp <= 0 || s.x > 1.15 || s.y > 1.15) { SHOOTS.splice(i, 1); continue; }
-      const sx = s.x*w, sy = s.y*h;
-      const mag = Math.hypot(s.vx, s.vy);
-      const ex  = sx - (s.vx/mag)*s.len, ey = sy - (s.vy/mag)*s.len;
-      const gr  = ctx.createLinearGradient(sx, sy, ex, ey);
-      gr.addColorStop(0,    `rgba(255,255,255,${s.alp.toFixed(3)})`);
-      gr.addColorStop(0.25, `rgba(190,210,255,${(s.alp*0.55).toFixed(3)})`);
-      gr.addColorStop(1,    'rgba(0,0,0,0)');
-      ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey);
-      ctx.strokeStyle = gr; ctx.lineWidth = 1.6; ctx.stroke();
+    for (let i = METEORS.length - 1; i >= 0; i--) {
+      const m = METEORS[i];
+      m.x += m.vx * dt * 0.050;
+      m.y += m.vy * dt * 0.050;
+      m.alp -= 0.009 * (dt / 16);
+
+      if (
+        m.alp <= 0 ||
+        m.x < -0.30 || m.x > 1.30 ||
+        m.y < -0.20 || m.y > 1.20
+      ) {
+        METEORS.splice(i, 1);
+        continue;
+      }
+
+      const sx = m.x * w;
+      const sy = m.y * h;
+      const mag = Math.hypot(m.vx, m.vy);
+      const tx = (m.vx / mag) * m.len;
+      const ty = (m.vy / mag) * m.len;
+
+      const trail = ctx.createLinearGradient(sx, sy, sx - tx, sy - ty);
+      trail.addColorStop(0.00, `rgba(255,255,255,${(m.alp * 0.98).toFixed(3)})`);
+      trail.addColorStop(0.22, `rgba(255,235,170,${(m.alp * 0.72).toFixed(3)})`);
+      trail.addColorStop(0.55, `rgba(130,190,255,${(m.alp * 0.34).toFixed(3)})`);
+      trail.addColorStop(1.00, 'rgba(0,0,0,0)');
+
+      ctx.beginPath();
+      ctx.moveTo(sx, sy);
+      ctx.lineTo(sx - tx, sy - ty);
+      ctx.strokeStyle = trail;
+      ctx.lineWidth = m.size;
+      ctx.stroke();
+
+      const head = ctx.createRadialGradient(sx, sy, 0, sx, sy, m.size * 4.8);
+      head.addColorStop(0, `rgba(255,255,255,${m.alp.toFixed(3)})`);
+      head.addColorStop(0.35, `rgba(255,240,170,${(m.alp * 0.85).toFixed(3)})`);
+      head.addColorStop(1, 'rgba(255,170,95,0)');
+
+      ctx.beginPath();
+      ctx.arc(sx, sy, m.size * 2.2, 0, Math.PI * 2);
+      ctx.fillStyle = head;
+      ctx.fill();
     }
   }
 
@@ -1496,8 +1534,8 @@ d3.json("data.json").then(function(data) {
       drawCloud(c);
     });
 
-    maybeShoot();
-    drawShoots(dt);
+    maybeMeteor();
+    drawMeteors(dt);
 
     requestAnimationFrame(frame);
   }
