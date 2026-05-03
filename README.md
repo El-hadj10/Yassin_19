@@ -1,5 +1,7 @@
 # Bouclier de Yassin x 19
 
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-success?style=for-the-badge&logo=github&logoColor=white)](https://el-hadj10.github.io/Yassin_19/)
+
 ![Apercu du site Bouclier de Yassin x 19](web/site-preview.png)
 
 Visualisation spirituelle et mathematique de la sourate Yassin (36), articulee autour du nombre 19.
